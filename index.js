@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const indexRoute = require("./routes/indexRoute");
-const logger = require("morgan");
+// const logger = require("morgan");
 const app = express();
 
 app.set("views", path.join(__dirname, "views")); // Set the views directory
