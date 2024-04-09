@@ -1,6 +1,8 @@
 ### Prizm Doc Server REST API Upload App
 
-A (not yet finished) Node.js & Express.js app that allows you to upload a file (via an HTML form) to the PrizmDoc Server REST API for conversion.
+The Node & Express app uses the PrizmDoc Servers `Content Conversion Service REST API`. The *content converters* REST API allows your application to convert files from a variety of input formats to several common output formats.
+
+This project is not finished yet so please only use it as a starter for your own projects, not for production...
 
 ### Prerequisites
 
