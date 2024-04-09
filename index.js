@@ -1,12 +1,10 @@
 const express = require("express");
 const path = require("path");
 const indexRoute = require("./routes/indexRoute");
-// const logger = require("morgan");
 const app = express();
 
 app.set("views", path.join(__dirname, "views")); // Set the views directory
 app.set("view engine", "hbs"); // Set the view engine to handlebars
-app.use(logger("dev"));
 
 // Expose all of the files in the public directory as static assets which the browser can request.
 // For example, for the file public/stylesheets/style.css, the browser can request /stylesheets/style.css.

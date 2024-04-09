@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
 });
 
 // --------------------------------------------------------
-
+// POST
 const workFile = async (fileBuffer, res) => {
     let config = {
         method: "post",
@@ -53,6 +53,7 @@ const workFile = async (fileBuffer, res) => {
 
 // --------------------------------------------------------
 
+// POST
 // This functions main role is to get the `processId` (from the `inputObj`)
 // You will use this processId in subsequent GET calls to get the status and final results of the conversion
 const contentConverter = async (workFileObj, res) => {
@@ -111,7 +112,7 @@ const contentConverter = async (workFileObj, res) => {
 
 // --------------------------------------------------------
 
-// Gets the status of a content conversion operation and its final output if available.
+// GETs the status of a content conversion operation and its final output if available.
 const getConversionStatus = async (contentConverterObj, res) => {
     const url = `${baseURL}/v2/contentConverters/${contentConverterObj.processId}`;
     let config = {
@@ -159,6 +160,7 @@ const getConversionStatus = async (contentConverterObj, res) => {
 
 // --------------------------------------------------------
 
+// GETs the output file
 const getOutputFile = async (workFileOutputObj, res) => {
     let url = `${baseURL}/PCCIS/V1/WorkFile/${workFileOutputObj.processingObj.output.results[0].fileId}`;
 
@@ -167,7 +169,6 @@ const getOutputFile = async (workFileOutputObj, res) => {
         url: url,
         headers: {
             "Acs-Api-Key": apiKey,
-            // "Content-Type": "application/octet-stream", // check
             "Accusoft-Affinity-Token": workFileOutputObj.affinityToken, // check this...
             //"Content-Disposition": "attachment; filename=output.pdf",
         },
