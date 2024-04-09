@@ -167,9 +167,9 @@ const getOutputFile = async (workFileOutputObj, res) => {
         url: url,
         headers: {
             "Acs-Api-Key": apiKey,
-            "Content-Type": "application/octet-stream",
-            "Accusoft-Affinity-Token": workFileOutputObj.affinityToken,
-            "Content-Disposition": "attachment; filename=output.pdf",
+            // "Content-Type": "application/octet-stream", // check
+            "Accusoft-Affinity-Token": workFileOutputObj.affinityToken, // check this...
+            //"Content-Disposition": "attachment; filename=output.pdf",
         },
     };
 
