@@ -2,7 +2,7 @@
 
 This Node & Express app uses the PrizmDoc Servers `Content Conversion Service REST API`. The *content converters* REST API allows your application to convert files from a variety of input [formats](https://help.accusoft.com/PrizmDoc/latest/HTML/supported-file-formats.html) to several common output formats: **PDF, TIFF, PNG, JPEG, SVG, DOCX, XLSX**.
 
-This project is not finished so please only use it as a starter for your own projects, not for production...if you are new to Node and Express this *could possibly* be a simple starter for your own projects.
+This project is **not finished**, I'd call it a "rough draft" lol ...so please only use it as a starter for your own projects, not for production...In other words, if you are new to Node and Express this *could possibly* be a simple starter, or outline, for your own project.
 
 ### Tech Stack
 
