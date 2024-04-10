@@ -20,19 +20,19 @@ router.get("/", (req, res) => {
 // --------------------------------------------------------
 // POST
 const workFile = async (fileBuffer, res) => {
-    let config = {
-        method: "post",
-        maxBodyLength: Infinity,
-        url: `${baseURL}/PCCIS/V1/WorkFile?FileExtension=${fileExtension}`,
-        headers: {
-            "Content-Type": "application/octet-stream",
-            "Accusoft-Affinity-Hint": "pdf",
-            "Acs-Api-Key": apiKey,
-        },
-        fileBuffer: fileBuffer,
-    };
-
     try {
+        let config = {
+            method: "post",
+            maxBodyLength: Infinity,
+            url: `${baseURL}/PCCIS/V1/WorkFile?FileExtension=${fileExtension}`,
+            headers: {
+                "Content-Type": "application/octet-stream",
+                "Accusoft-Affinity-Hint": "pdf",
+                "Acs-Api-Key": apiKey,
+            },
+            fileBuffer: fileBuffer,
+        };
+
         const response = await axios(config); // send the request to the API
         if (response.status !== 200) {
             res.status(500).send("Call to fileId API caused an error!");
@@ -53,41 +53,39 @@ const workFile = async (fileBuffer, res) => {
 
 // --------------------------------------------------------
 
-// POST
-// This functions main role is to get the `processId` (from the `inputObj`)
-// You will use this processId in subsequent GET calls to get the status and final results of the conversion
+// POST request for the `processId`
+// Use processId in subsequent GET calls to get the conversion
 const contentConverter = async (workFileObj, res) => {
-    const fileId = workFileObj.fileId; // get the fileId from the workFile object
-    const affinityToken = workFileObj.affinityToken; // get the affinityToken from the workFile object
-
-    let data = JSON.stringify({
-        input: {
-            sources: [
-                {
-                    fileId: fileId,
-                },
-            ],
-            dest: {
-                format: "pdf",
-            },
-        },
-    });
-
-    let config = {
-        method: "post",
-        maxBodyLength: Infinity,
-        url: `${baseURL}/v2/contentConverters`,
-        headers: {
-            "Content-Type": "application/json",
-            "Accusoft-Affinity-Token": affinityToken,
-            "Acs-Api-Key": apiKey,
-        },
-        data: data,
-    };
-
-    // ------------------------------------------
-
     try {
+        const fileId = workFileObj.fileId; // get the fileId from the workFile object
+        const affinityToken = workFileObj.affinityToken; // get the affinityToken from the workFile object
+
+        let data = JSON.stringify({
+            input: {
+                sources: [
+                    {
+                        fileId: fileId,
+                    },
+                ],
+                dest: {
+                    format: "pdf",
+                },
+            },
+        });
+
+        let config = {
+            method: "post",
+            maxBodyLength: Infinity,
+            url: `${baseURL}/v2/contentConverters`,
+            headers: {
+                "Content-Type": "application/json",
+                "Accusoft-Affinity-Token": affinityToken,
+                "Acs-Api-Key": apiKey,
+            },
+            data: data,
+        };
+
+        // ------------------------------------------
         const response = await axios(config); // send the request to the API
         if (response.status !== 200) {
             res.status(500).send("POST request to /v2/contentConverters failed");
@@ -98,7 +96,7 @@ const contentConverter = async (workFileObj, res) => {
         // This object will be used to get the `processId` and other values `{input, processId, state, percentComplete, affinityToken}`
         const contentConverterObj = {
             input: response.data.input, // contains your fileId
-            processId: response.data.processId,
+            processId: response.data.processId, // use this processId in subsequent GET calls to get the status and final results of the conversion
             state: response.data.state,
             percentComplete: response.data.percentComplete,
             affinityToken: affinityToken, // from the workFile object
@@ -114,19 +112,18 @@ const contentConverter = async (workFileObj, res) => {
 
 // GETs the status of a content conversion operation and its final output if available.
 const getConversionStatus = async (contentConverterObj, res) => {
-    const url = `${baseURL}/v2/contentConverters/${contentConverterObj.processId}`;
-    let config = {
-        method: "get",
-        url: url,
-        headers: {
-            "Accusoft-Affinity-Token": contentConverterObj.affinityToken,
-            "Acs-Api-Key": apiKey,
-        },
-    };
-
-    // ---------------- poll for state ---------------- //
-
     try {
+        const url = `${baseURL}/v2/contentConverters/${contentConverterObj.processId}`;
+        let config = {
+            method: "get",
+            url: url,
+            headers: {
+                "Acs-Api-Key": apiKey,
+                "Accusoft-Affinity-Token": contentConverterObj.affinityToken,
+            },
+        };
+
+        // ---------------- poll for state ---------------- //
         let currentState;
         let processingObj;
         do {
@@ -162,19 +159,18 @@ const getConversionStatus = async (contentConverterObj, res) => {
 
 // GETs the output file
 const getOutputFile = async (workFileOutputObj, res) => {
-    let url = `${baseURL}/PCCIS/V1/WorkFile/${workFileOutputObj.processingObj.output.results[0].fileId}`;
-
-    let config = {
-        method: "get",
-        url: url,
-        headers: {
-            "Acs-Api-Key": apiKey,
-            "Accusoft-Affinity-Token": workFileOutputObj.affinityToken, // check this...
-            //"Content-Disposition": "attachment; filename=output.pdf",
-        },
-    };
-
     try {
+        let url = `${baseURL}/PCCIS/V1/WorkFile/${workFileOutputObj.processingObj.output.results[0].fileId}`;
+
+        let config = {
+            method: "get",
+            url: url,
+            headers: {
+                "Acs-Api-Key": apiKey,
+                "Accusoft-Affinity-Token": workFileOutputObj.affinityToken, // check this...
+                //"Content-Disposition": "attachment; filename=output.pdf",
+            },
+        };
         let response = await axios(config); // send the request to the API
         if (response.status !== 200) {
             res.status(500).send("GET request to /PCCIS/V1/WorkFile/{fileId} failed");
@@ -184,13 +180,11 @@ const getOutputFile = async (workFileOutputObj, res) => {
         // log entire response data
         console.log(util.inspect(response.data, false, null, true));
 
-        // ================== TODO: ===============================
-        // TODO:
+        // ================== TODO: ==================
         // fs.writeFileSync("output.pdf", response.data, "binary");
 
-        // TODO: send the file to the client???
+        // ================== TODO: ==================
         // res.download("output.pdf");
-        // ================== TODO: ===============================
 
         // --- error handling --- //
     } catch (error) {
@@ -201,8 +195,8 @@ const getOutputFile = async (workFileOutputObj, res) => {
 // --------------------------------------------------------
 
 router.post("/api/upload", upload.single("inputfile"), async (req, res) => {
-    const fileBuffer = req.file.buffer; // A Buffer containing the entire file
     try {
+        const fileBuffer = req.file.buffer; // A Buffer containing the entire file
         if (!req.file) {
             res.status(400).send("No file uploaded.");
             return;
@@ -211,14 +205,14 @@ router.post("/api/upload", upload.single("inputfile"), async (req, res) => {
         let workFileObj = await workFile(fileBuffer, res); // returns fileId & affinityToken values
 
         // use fileId to get the input object `input {...}`
-        let contentConverterObj = await contentConverter(workFileObj, res);
+        let contentConverterObj = await contentConverter(workFileObj, res); // returns processId & affinityToken values
 
         // polls the API until the process is complete
-        let workFileOutputObj = await getConversionStatus(contentConverterObj, res);
+        let workFileOutputObj = await getConversionStatus(contentConverterObj, res); // returns processingObj
 
-        // ================== TODO: ===============================
+        // ================== TODO: ==================
         // TODO: get the final output file...
-        // --------------------------------------------------------
+
         const outputFile = await getOutputFile(workFileOutputObj, res);
 
         // --- error handling --- //
