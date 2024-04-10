@@ -171,6 +171,7 @@ const getOutputFile = async (workFileOutputObj, affinityToken, res) => {
         let config = {
             method: "get",
             url: url,
+            responseType: "arraybuffer",
             headers: {
                 "Acs-Api-Key": apiKey,
                 "Accusoft-Affinity-Token": affinityToken,
@@ -183,13 +184,14 @@ const getOutputFile = async (workFileOutputObj, affinityToken, res) => {
         }
 
         // log entire response data
-        console.log(util.inspect(response.data, false, null, true));
+        console.log(util.inspect(response.data, false, null, true)); // logs binary/pdf
+
+        // ================== TODO ==================
+        // handle the response data
+        // fs.writeFileSync("output.pdf", response.data, "binary"); // 'work in progress'
 
         // ================== TODO: ==================
-        // fs.writeFileSync("output.pdf", response.data, "binary");
-
-        // ================== TODO: ==================
-        // res.download("output.pdf");
+        // res.status(200).send("File created successfully!"); | or send the file back to the client | ???
 
         // --- error handling --- //
     } catch (error) {
@@ -206,14 +208,12 @@ router.post("/api/upload", upload.single("inputfile"), async (req, res) => {
             res.status(400).send("No file uploaded.");
             return;
         }
-        // send a fileBuffer to get -> fileId
+        // Call the workFile function
         let workFileObj = await workFile(fileBuffer, res, (affinityToken) => {
-            // now you can log your affinityToken here...
             console.log("affinityToken ->", affinityToken);
         });
 
         // use fileId to get the input object `input {...}`
-        // let contentConverterObj = await contentConverter(workFileObj, res); // returns processId & affinityToken values
         let contentConverterObj = await contentConverter(
             workFileObj,
             workFileObj.affinityToken,
@@ -221,7 +221,6 @@ router.post("/api/upload", upload.single("inputfile"), async (req, res) => {
         );
 
         // polls the API until the process is complete
-        // let workFileOutputObj = await getConversionStatus(contentConverterObj, res); // returns processingObj
         let workFileOutputObj = await getConversionStatus(
             contentConverterObj,
             workFileObj.affinityToken,
@@ -229,8 +228,6 @@ router.post("/api/upload", upload.single("inputfile"), async (req, res) => {
         );
 
         // ================== TODO: ==================
-        // TODO: get the final output file...const outputFile = await getOutputFile(workFileOutputObj, res);
-
         let outputFile = await getOutputFile(
             workFileOutputObj,
             workFileObj.affinityToken,
@@ -240,7 +237,7 @@ router.post("/api/upload", upload.single("inputfile"), async (req, res) => {
         // --- error handling --- //
     } catch (error) {
         console.log(error);
-        // res.status(500).send("An error occurred.");
+        res.status(500).send("An error occurred.");
     }
 });
 
