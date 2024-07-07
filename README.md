@@ -6,7 +6,7 @@ The API documentation is _excellent_. You can find it [here](https://help.accuso
 
 I used the `Content Conversion Service REST API` which allows your application to convert files from a variety of input [formats](https://help.accusoft.com/PrizmDoc/latest/HTML/supported-file-formats.html) to several common output formats: **PDF, TIFF, PNG, JPEG, SVG, DOCX, XLSX**.
 
-A very quick summary of the coversion process is as follows:
+A very quick summary of the conversion process is as follows:
 
 To convert a file using the REST API:
 
